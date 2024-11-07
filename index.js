@@ -1,5 +1,6 @@
 const express = require('express');
 const nodemailer = require('nodemailer');
+const cors = require('cors'); // Import the cors package
 require('dotenv').config(); // Load environment variables
 const { MongoClient, ServerApiVersion } = require('mongodb');
 
@@ -19,10 +20,16 @@ const client = new MongoClient(uri, {
 
 const app = express();
 
-app.use(express.json());
+// Use CORS to allow requests from specific origins (or all origins for testing purposes)
+app.use(cors({
+  origin: 'https://js-form-data-capture.vercel.app', // Allow only your frontend domain (change if necessary)
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
 
-// Serve static files from the 'public' directory
-app.use(express.static('public'));
+// Middlewares
+app.use(express.json());  // to parse JSON bodies
+app.use(express.static('public'));  // Serve static files like CSS and images from the 'public' folder
 
 // Connect to MongoDB
 let db;

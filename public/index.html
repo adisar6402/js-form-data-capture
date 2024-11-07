@@ -35,7 +35,7 @@
         <section id="form-section" class="form-section">
             <h2>Contact Information</h2>
             <p>Please fill out the form below to get in touch. Your information will be processed securely, and we'll get back to you shortly.</p>
-            <form id="userForm" action="/send-email" method="POST" enctype="multipart/form-data">
+            <form id="userForm" action="https://interactive-form-api.vercel.app//send-email" method="POST"> enctype="multipart/form-data">
                 <label for="name">Name:</label>
                 <input type="text" id="name" name="name" required autocomplete="name">
                 
@@ -91,6 +91,39 @@
         </p>
     </footer>
     
-    <script src="script.js"></script>
+    <script>
+        const form = document.getElementById('userForm');
+        const formMessage = document.getElementById('formMessage');
+        const formError = document.getElementById('formError');
+        const loading = document.getElementById('loading');
+        
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault(); // Prevent default form submission
+            loading.style.display = 'block'; // Show loading spinner
+            
+            const formData = new FormData(form);
+            
+            try {
+                const response = await fetch('/send-email', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    formMessage.style.display = 'block';
+                    formError.style.display = 'none';
+                } else {
+                    formMessage.style.display = 'none';
+                    formError.style.display = 'block';
+                }
+            } catch (error) {
+                formMessage.style.display = 'none';
+                formError.style.display = 'block';
+                console.error('Error submitting form:', error);
+            } finally {
+                loading.style.display = 'none'; // Hide loading spinner
+            }
+        });
+    </script>
 </body>
 </html>
