@@ -1,14 +1,15 @@
 const express = require('express');
 const nodemailer = require('nodemailer');
-const cors = require('cors');
-require('dotenv').config();
+const cors = require('cors'); // Import the cors package
+require('dotenv').config(); // Load environment variables
 const { MongoClient, ServerApiVersion } = require('mongodb');
 
+// Confirm Environment Variables Load Correctly
 console.log('EMAIL_USER:', process.env.EMAIL_USER);
 console.log('EMAIL_PASS:', process.env.EMAIL_PASS);
 console.log('MONGODB_URI:', process.env.MONGODB_URI);
 
-const uri = process.env.MONGODB_URI;
+const uri = process.env.MONGODB_URI; // Load from .env file
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
@@ -19,6 +20,7 @@ const client = new MongoClient(uri, {
 
 const app = express();
 
+// CORS configuration
 app.use(cors({
   origin: 'https://js-form-data-capture.vercel.app', // Allow only your frontend domain
   methods: ['GET', 'POST'],
@@ -26,26 +28,28 @@ app.use(cors({
 }));
 
 // Middlewares
-app.use(express.json());
-app.use(express.urlencoded({ extended: true })); // Add this to handle form submissions
-app.use(express.static('public'));
+app.use(express.json());  // to parse JSON bodies
+app.use(express.static('public'));  // Serve static files like CSS and images from the 'public' folder
 
+// MongoDB Connection
 let db;
 async function connectToDatabase() {
   try {
     await client.connect();
-    db = client.db("emailstoragecluster");
+    db = client.db("emailstoragecluster"); // Your database name
     console.log("Connected to MongoDB!");
   } catch (error) {
     console.error("MongoDB connection error:", error);
-    process.exit(1);
+    process.exit(1); // Exit if DB connection fails
   }
 }
 
+// Endpoint to serve the index.html page
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/public/index.html');
 });
 
+// Handle form submission and email sending
 app.post('/send-email', async (req, res) => {
   const { name, email, contact, phone } = req.body;
 
@@ -57,7 +61,7 @@ app.post('/send-email', async (req, res) => {
   const submission = { name, email, contact, phone, date: new Date() };
   try {
     const collection = db.collection('submissions');
-    await collection.insertOne(submission);
+    await collection.insertOne(submission); // Save to MongoDB
     console.log('Form submission saved to MongoDB:', submission);
   } catch (error) {
     console.error('Error saving to MongoDB:', error);
@@ -89,5 +93,6 @@ app.post('/send-email', async (req, res) => {
   });
 });
 
+// Export the app for Vercel serverless functions
 connectToDatabase();
 module.exports = app;
