@@ -95,4 +95,3 @@ app.post('/send-email', async (req, res) => {
 // Start the server
 connectToDatabase(); // Connect to the database before starting the server
 module.exports = app;
- 
