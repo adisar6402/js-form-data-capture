@@ -35,7 +35,7 @@
         <section id="form-section" class="form-section">
             <h2>Contact Information</h2>
             <p>Please fill out the form below to get in touch. Your information will be processed securely, and we'll get back to you shortly.</p>
-            <form id="userForm" action="https://interactive-form-api.vercel.app//send-email" method="POST">
+            <form id="userForm" action="https://interactive-form-api.vercel.app/send-email" method="POST" novalidate>
                 <label for="name">Name:</label>
                 <input type="text" id="name" name="name" required autocomplete="name">
                 
@@ -58,8 +58,8 @@
                 
                 <button type="submit" id="submitBtn">Submit</button>
                 
-                <p id="formMessage" style="color: green; display: none;">Thank you! Your submission was received successfully.</p>
-                <p id="formError" style="color: red; display: none;">Oops! Something went wrong. Please try again later.</p>
+                <p id="formMessage" aria-live="polite" style="color: green; display: none;">Thank you! Your submission was received successfully.</p>
+                <p id="formError" aria-live="polite" style="color: red; display: none;">Oops! Something went wrong. Please try again later.</p>
                 <div id="loading" style="display: none;">Submitting... Please wait.</div>
             </form>
         </section>
@@ -96,6 +96,20 @@
         const formMessage = document.getElementById('formMessage');
         const formError = document.getElementById('formError');
         const loading = document.getElementById('loading');
+        const contactSelect = document.getElementById('contact');
+        const phoneLabel = document.getElementById('phoneLabel');
+        const phoneInput = document.getElementById('phoneInput');
+        
+        // Show/hide phone input based on selected contact method
+        contactSelect.addEventListener('change', function() {
+            if (contactSelect.value === 'phone') {
+                phoneLabel.style.display = 'block';
+                phoneInput.style.display = 'block';
+            } else {
+                phoneLabel.style.display = 'none';
+                phoneInput.style.display = 'none';
+            }
+        });
         
         form.addEventListener('submit', async (event) => {
             event.preventDefault(); // Prevent default form submission
@@ -104,7 +118,7 @@
             const formData = new FormData(form);
             
             try {
-                const response = await fetch('/send-email', {
+                const response = await fetch('https://interactive-form-api.vercel.app/send-email', {
                     method: 'POST',
                     body: formData
                 });
@@ -112,6 +126,7 @@
                 if (response.ok) {
                     formMessage.style.display = 'block';
                     formError.style.display = 'none';
+                    form.reset(); // Reset form upon successful submission
                 } else {
                     formMessage.style.display = 'none';
                     formError.style.display = 'block';
