@@ -1,15 +1,14 @@
 const express = require('express');
 const nodemailer = require('nodemailer');
-const cors = require('cors'); // Import the cors package
-require('dotenv').config(); // Load environment variables
+const cors = require('cors');
+require('dotenv').config();
 const { MongoClient, ServerApiVersion } = require('mongodb');
 
-// Confirm Environment Variables Load Correctly
 console.log('EMAIL_USER:', process.env.EMAIL_USER);
 console.log('EMAIL_PASS:', process.env.EMAIL_PASS);
 console.log('MONGODB_URI:', process.env.MONGODB_URI);
 
-const uri = process.env.MONGODB_URI; // Load from .env file
+const uri = process.env.MONGODB_URI;
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
@@ -20,31 +19,29 @@ const client = new MongoClient(uri, {
 
 const app = express();
 
-// Use CORS to allow requests from specific origins (or all origins for testing purposes)
 app.use(cors({
-  origin: 'https://js-form-data-capture.vercel.app', // Allow only your frontend domain (change if necessary)
+  origin: 'https://js-form-data-capture.vercel.app', // Allow only your frontend domain
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
 // Middlewares
-app.use(express.json());  // to parse JSON bodies
-app.use(express.static('public'));  // Serve static files like CSS and images from the 'public' folder
+app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // Add this to handle form submissions
+app.use(express.static('public'));
 
-// Connect to MongoDB
 let db;
 async function connectToDatabase() {
   try {
     await client.connect();
-    db = client.db("emailstoragecluster"); // Use your actual database name
+    db = client.db("emailstoragecluster");
     console.log("Connected to MongoDB!");
   } catch (error) {
     console.error("MongoDB connection error:", error);
-    process.exit(1); // Exit the process if unable to connect to the database
+    process.exit(1);
   }
 }
 
-// Serve the index.html file when the root URL is accessed
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/public/index.html');
 });
@@ -92,6 +89,5 @@ app.post('/send-email', async (req, res) => {
   });
 });
 
-// Export the app for Vercel serverless functions
-connectToDatabase(); // Connect to the database when the module is loaded
+connectToDatabase();
 module.exports = app;
