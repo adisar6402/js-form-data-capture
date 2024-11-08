@@ -20,9 +20,9 @@ const client = new MongoClient(uri, {
 
 const app = express();
 
-// CORS configuration
+// Use CORS to allow requests from specific origins (or all origins for testing purposes)
 app.use(cors({
-  origin: 'https://js-form-data-capture.vercel.app', // Allow only your frontend domain
+  origin: ['https://js-form-data-capture.vercel.app'], // Allow only your frontend domain (change if necessary)
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
@@ -31,43 +31,45 @@ app.use(cors({
 app.use(express.json());  // to parse JSON bodies
 app.use(express.static('public'));  // Serve static files like CSS and images from the 'public' folder
 
-// MongoDB Connection
+// Connect to MongoDB
 let db;
 async function connectToDatabase() {
   try {
     await client.connect();
-    db = client.db("emailstoragecluster"); // Your database name
+    db = client.db("emailstoragecluster"); // Use your actual database name
     console.log("Connected to MongoDB!");
   } catch (error) {
     console.error("MongoDB connection error:", error);
-    process.exit(1); // Exit if DB connection fails
+    process.exit(1); // Exit the process if unable to connect to the database
   }
 }
 
-// Endpoint to serve the index.html page
+// Serve the index.html file when the root URL is accessed
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/public/index.html');
 });
 
-// Handle form submission and email sending
 app.post('/send-email', async (req, res) => {
   const { name, email, contact, phone } = req.body;
 
+  // Check if the database is connected
   if (!db) {
     console.error("Database not connected");
     return res.status(500).send("Database connection failed");
   }
 
+  // Log the submission for debugging
   const submission = { name, email, contact, phone, date: new Date() };
   try {
     const collection = db.collection('submissions');
-    await collection.insertOne(submission); // Save to MongoDB
+    await collection.insertOne(submission);
     console.log('Form submission saved to MongoDB:', submission);
   } catch (error) {
     console.error('Error saving to MongoDB:', error);
     return res.status(500).send('Error saving form submission');
   }
 
+  // Set up the email transport configuration using Nodemailer
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -76,6 +78,7 @@ app.post('/send-email', async (req, res) => {
     },
   });
 
+  // Email content and recipient
   const mailOptions = {
     from: email,
     to: process.env.EMAIL_USER,
@@ -83,6 +86,7 @@ app.post('/send-email', async (req, res) => {
     text: `Name: ${name}\nEmail: ${email}\nContact Method: ${contact}${contact === 'phone' ? `\nPhone: ${phone}` : ''}`,
   };
 
+  // Send the email
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
       console.error('Error occurred while sending email:', error);
@@ -94,5 +98,5 @@ app.post('/send-email', async (req, res) => {
 });
 
 // Export the app for Vercel serverless functions
-connectToDatabase();
+connectToDatabase(); // Connect to the database when the module is loaded
 module.exports = app;
