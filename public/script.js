@@ -15,18 +15,16 @@ document.getElementById('contact').addEventListener('change', function () {
 document.getElementById('userForm').addEventListener('submit', async function (event) {
     event.preventDefault(); // Prevent default form submission
     const formData = new FormData(this); // Capture form data
-    const formDataObj = Object.fromEntries(formData.entries()); // Convert to object
-    console.log('FormData Object:', formDataObj); // Log FormData object to console
     document.getElementById('loading').style.display = 'block'; // Show loading indicator
 
     try {
         // Updated for Vercel endpoint
         const response = await fetch('https://interactive-form-api.vercel.app/send-email', { // Vercel server endpoint
             method: 'POST',
-            body: JSON.stringify(formDataObj),
+            body: formData,
             headers: {
-                'Content-Type': 'application/json',
                 'Accept': 'application/json',
+                // 'Content-Type': 'multipart/form-data' // No need to set this header when using FormData
             }
         });
         document.getElementById('loading').style.display = 'none'; // Hide loading indicator
@@ -34,7 +32,7 @@ document.getElementById('userForm').addEventListener('submit', async function (e
         if (response.ok) {
             document.getElementById('formMessage').style.display = 'block';
             document.getElementById('formError').style.display = 'none';
-            displayFormSummary(formDataObj); // Display form submission summary
+            displayFormSummary(Object.fromEntries(formData.entries())); // Display form submission summary
             this.reset(); // Reset the form after successful submission
         } else {
             const errorText = await response.text();
