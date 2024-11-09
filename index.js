@@ -1,15 +1,10 @@
 const express = require('express');
 const nodemailer = require('nodemailer');
-const cors = require('cors'); // Import CORS package
-require('dotenv').config(); // Load environment variables
+const cors = require('cors'); // Import CORS
+require('dotenv').config();
 const { MongoClient, ServerApiVersion } = require('mongodb');
 
-// Confirm Environment Variables Load Correctly
-console.log('EMAIL_USER:', process.env.EMAIL_USER);
-console.log('EMAIL_PASS:', process.env.EMAIL_PASS);
-console.log('MONGODB_URI:', process.env.MONGODB_URI);
-
-const uri = process.env.MONGODB_URI; // Load from .env file
+const uri = process.env.MONGODB_URI;
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
@@ -20,40 +15,43 @@ const client = new MongoClient(uri, {
 
 const app = express();
 
-// Use CORS to allow requests from specific origins (only your frontend URL)
+// Updated CORS configuration to allow requests from your frontend domain
 app.use(cors({
-  origin: ['https://js-form-data-capture.vercel.app'], // Allow only this frontend
-  methods: ['GET', 'POST'],
+  origin: 'https://js-form-data-capture.vercel.app', // Replace with your actual frontend URL
+  methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true, // Allow credentials if needed
 }));
 
-// Middleware for parsing JSON requests
+// Middleware
 app.use(express.json());
+app.use(express.static('public'));
 
 // Connect to MongoDB
 let db;
 async function connectToDatabase() {
   try {
     await client.connect();
-    db = client.db("emailstoragecluster"); // Your database name
+    db = client.db("emailstoragecluster");
     console.log("Connected to MongoDB!");
   } catch (error) {
     console.error("MongoDB connection error:", error);
-    process.exit(1); // Exit the process if unable to connect
+    process.exit(1);
   }
 }
 
-// Route to handle form submission
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/public/index.html');
+});
+
 app.post('/send-email', async (req, res) => {
   const { name, email, contact, phone } = req.body;
 
-  // Check if the database is connected
   if (!db) {
     console.error("Database not connected");
     return res.status(500).send("Database connection failed");
   }
 
-  // Log the submission for debugging
   const submission = { name, email, contact, phone, date: new Date() };
   try {
     const collection = db.collection('submissions');
@@ -64,7 +62,6 @@ app.post('/send-email', async (req, res) => {
     return res.status(500).send('Error saving form submission');
   }
 
-  // Set up Nodemailer for email sending
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -73,7 +70,6 @@ app.post('/send-email', async (req, res) => {
     },
   });
 
-  // Set the email details
   const mailOptions = {
     from: email,
     to: process.env.EMAIL_USER,
@@ -81,10 +77,9 @@ app.post('/send-email', async (req, res) => {
     text: `Name: ${name}\nEmail: ${email}\nContact Method: ${contact}${contact === 'phone' ? `\nPhone: ${phone}` : ''}`,
   };
 
-  // Send the email
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
-      console.error('Error sending email:', error);
+      console.error('Error occurred while sending email:', error);
       return res.status(500).send('Error sending email');
     }
     console.log('Email sent:', info.response);
@@ -92,6 +87,5 @@ app.post('/send-email', async (req, res) => {
   });
 });
 
-// Start the server
-connectToDatabase(); // Connect to the database before starting the server
+connectToDatabase();
 module.exports = app;
