@@ -15,12 +15,12 @@ const client = new MongoClient(uri, {
 
 const app = express();
 
-// Updated CORS configuration to allow requests from your frontend domain
+// CORS configuration to allow requests from your frontend domain
 app.use(cors({
   origin: 'https://js-form-data-capture.vercel.app', // Replace with your actual frontend URL
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true, // Allow credentials if needed
+  credentials: true,
 }));
 
 // Middleware
@@ -80,12 +80,19 @@ app.post('/send-email', async (req, res) => {
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
       console.error('Error occurred while sending email:', error);
-      return res.status(500).send('Error sending email');
+      return res.status(500).send(`Error sending email: ${error.message}`);
     }
     console.log('Email sent:', info.response);
     res.status(200).send('Form submission successful');
   });
 });
 
-connectToDatabase();
+// Connect to database and start server
+connectToDatabase().then(() => {
+  const PORT = process.env.PORT || 9000;
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+});
+
 module.exports = app;
