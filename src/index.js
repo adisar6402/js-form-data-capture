@@ -24,15 +24,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Capture form data
         const formData = new FormData(form);
-        const data = {
-            name: formData.get('name'),
-            email: formData.get('email'),
-            contact: formData.get('contact'),
-            phone: formData.get('contact') === 'phone' ? formData.get('phone') : null,
-        };
+        const data = {};
+        formData.forEach((value, key) => {
+            data[key] = value;
+        });
+
+        console.log('Form data to be sent:', JSON.stringify(data)); // Log the JSON data
 
         try {
-            const response = await fetch('https://interactive-form-api.vercel.app/send-email', {
+            const response = await fetch('/.netlify/functions/formHandler', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -41,11 +41,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify(data),
             });
 
+            const result = await response.json();
+            console.log('Response from server:', result); // Log the response from server
+
             if (response.ok) {
                 displaySuccess();
                 updateSummary(data);
                 form.reset();  // Reset form on success
             } else {
+                console.error('Server response not OK:', result); // Log the server response if not OK
                 displayError();
             }
         } catch (error) {
