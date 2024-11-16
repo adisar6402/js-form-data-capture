@@ -50,7 +50,7 @@ exports.handler = async (event, context) => {
     // Email options
     const mailOptions = {
         from: process.env.EMAIL_USER, // Sender address
-        to: 'recipient-email@gmail.com', // List of recipients (replace with your desired recipient email)
+        to: 'adisar6402@gmail.com', // List of recipients (replace with your desired recipient email)
         subject: 'New Form Submission',
         text: `You have a new form submission:\n\n${JSON.stringify(data, null, 2)}`,
     };
