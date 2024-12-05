@@ -43,7 +43,10 @@ exports.handler = async (event) => {
 
     let data;
     try {
-        data = JSON.parse(event.body);
+        // Assuming the data is sent as FormData, which would be key-value pairs.
+        const formData = new URLSearchParams(event.body);
+        data = Object.fromEntries(formData.entries());
+        
         if (!data.name || !data.email || !data.message) {
             return {
                 statusCode: 400,
