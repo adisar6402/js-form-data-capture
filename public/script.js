@@ -15,11 +15,19 @@ document.getElementById('contact').addEventListener('change', function () {
 document.getElementById('userForm').addEventListener('submit', async function (event) {
     event.preventDefault(); // Prevent default form submission
     const formData = new FormData(this); // Capture form data
+    
+    // Simple form validation (example)
+    if (!formData.get('name') || !formData.get('email') || !formData.get('contact')) {
+        document.getElementById('formError').style.display = 'block';
+        document.getElementById('formError').textContent = 'Please fill in all required fields.';
+        return;
+    }
+
     document.getElementById('loading').style.display = 'block'; // Show loading indicator
 
     try {
-        // Updated for Vercel endpoint
-        const response = await fetch('https://interactive-form-api.vercel.app/send-email', { // Vercel server endpoint
+        // Updated for Netlify function endpoint (no Vercel)
+        const response = await fetch('/.netlify/functions/send-email', { // Netlify function endpoint
             method: 'POST',
             body: formData,
             headers: {
@@ -27,6 +35,7 @@ document.getElementById('userForm').addEventListener('submit', async function (e
                 // 'Content-Type': 'multipart/form-data' // No need to set this header when using FormData
             }
         });
+
         document.getElementById('loading').style.display = 'none'; // Hide loading indicator
 
         if (response.ok) {
@@ -50,7 +59,7 @@ document.getElementById('userForm').addEventListener('submit', async function (e
 // Display summary of the form submission
 function displayFormSummary(data) {
     const summary = document.getElementById('summary');
-    summary.innerHTML = `
+    summary.innerHTML = ` 
         <strong>Name:</strong> ${data.name}<br>
         <strong>Email:</strong> ${data.email}<br>
         <strong>Preferred Contact Method:</strong> ${data.contact}${data.contact === 'phone' ? `<br><strong>Phone Number:</strong> ${data.phone}` : ''}<br>
