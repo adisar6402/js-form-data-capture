@@ -1,11 +1,8 @@
 const querystring = require('querystring');
-const sgMail = require('@sendgrid/mail');
+const nodemailer = require('nodemailer');
 const { MongoClient } = require('mongodb');
 require('dotenv').config();
 const validator = require('validator');
-
-// Set SendGrid API key
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 // MongoDB connection URL and database name
 const mongoUri = process.env.MONGODB_URI;
@@ -22,6 +19,15 @@ async function getMongoClient() {
     return cachedClient;
 }
 
+// Create a reusable transporter object using Gmail's SMTP
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_APP_PASSWORD,
+    },
+});
+
 exports.handler = async (event) => {
     // Add CORS headers to all responses
     const corsHeaders = {
@@ -31,6 +37,7 @@ exports.handler = async (event) => {
         'x-content-type-options': 'nosniff',
     };
 
+    // Handle preflight OPTIONS request
     if (event.httpMethod === 'OPTIONS') {
         return {
             statusCode: 200,
@@ -39,6 +46,7 @@ exports.handler = async (event) => {
         };
     }
 
+    // Allow only POST requests
     if (event.httpMethod !== 'POST') {
         return {
             statusCode: 405,
@@ -49,10 +57,22 @@ exports.handler = async (event) => {
 
     let data;
     try {
-        data = querystring.parse(event.body);
+        // Handle JSON and URL-encoded formats
+        if (event.headers['content-type'] === 'application/json') {
+            console.log('Parsing JSON body');
+            data = JSON.parse(event.body);
+        } else {
+            console.log('Parsing URL-encoded body');
+            data = querystring.parse(event.body);
+        }
 
         // Validate form data
-        if (!data.name || !data.email || !data.message || !validator.isEmail(data.email)) {
+        if (
+            validator.isEmpty(data.name) || 
+            validator.isEmpty(data.email) || 
+            validator.isEmpty(data.message) || 
+            !validator.isEmail(data.email)
+        ) {
             return {
                 statusCode: 400,
                 headers: corsHeaders,
@@ -70,15 +90,15 @@ exports.handler = async (event) => {
 
     // Email options
     const mailOptions = {
-        to: process.env.TO_EMAIL || 'adisar6402@gmail.com',
-        from: process.env.FROM_EMAIL,
+        to: process.env.GMAIL_USER, // Recipient (your email address)
+        from: process.env.GMAIL_USER, // Sender (your email address)
         subject: `New Form Submission by ${data.name}`,
         text: `You have a new form submission:\n\n${JSON.stringify(data, null, 2)}`,
     };
 
     try {
-        // Send email via SendGrid
-        await sgMail.send(mailOptions);
+        // Send email via Gmail
+        await transporter.sendMail(mailOptions);
         console.log('Email sent successfully');
     } catch (error) {
         console.error('Error sending email:', error.message);
