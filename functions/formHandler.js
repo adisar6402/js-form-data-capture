@@ -57,13 +57,16 @@ exports.handler = async (event) => {
 
     let data;
     try {
-        // Handle JSON and URL-encoded formats
+        // Handle JSON format
         if (event.headers['content-type'] === 'application/json') {
             console.log('Parsing JSON body');
             data = JSON.parse(event.body);
         } else {
-            console.log('Parsing URL-encoded body');
-            data = querystring.parse(event.body);
+            return {
+                statusCode: 400,
+                headers: corsHeaders,
+                body: JSON.stringify({ message: 'Invalid Content-Type' }),
+            };
         }
 
         // Validate form data
