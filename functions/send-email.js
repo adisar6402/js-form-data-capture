@@ -58,14 +58,17 @@ exports.handler = async (event) => {
     let data;
     try {
         // Handle JSON format
-        if (event.headers['content-type'] === 'application/json') {
+        if (
+            event.headers['content-type'] &&
+            event.headers['content-type'].includes('application/json')
+        ) {
             console.log('Parsing JSON body');
             data = JSON.parse(event.body);
         } else {
             return {
                 statusCode: 400,
                 headers: corsHeaders,
-                body: JSON.stringify({ message: 'Invalid Content-Type' }),
+                body: JSON.stringify({ message: 'Invalid Content-Type. Please send application/json' }),
             };
         }
 
@@ -87,7 +90,7 @@ exports.handler = async (event) => {
         return {
             statusCode: 400,
             headers: corsHeaders,
-            body: JSON.stringify({ message: 'Invalid data format' }),
+            body: JSON.stringify({ message: 'Invalid data format. Please ensure JSON compliance.' }),
         };
     }
 

@@ -17,46 +17,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Handle form submission
     form.addEventListener('submit', async (event) => {
-        event.preventDefault();  // Prevent default form submission
-        loading.style.display = 'block';  // Show loading message
+        event.preventDefault(); // Prevent default form submission
+        loading.style.display = 'block'; // Show loading spinner
         formMessage.style.display = 'none';
         formError.style.display = 'none';
 
         // Capture form data
-        const formData = new FormData(form);
-        const data = {};
-        formData.forEach((value, key) => {
-            data[key] = value;
-        });
-
-        console.log('Form data to be sent:', JSON.stringify(data)); // Log the JSON data
+        const formData = Object.fromEntries(new FormData(form).entries()); // Convert FormData to object
+        console.log('Form data to be sent:', JSON.stringify(formData));
 
         try {
-            const response = await fetch('/.netlify/functions/formHandler', {
+            const response = await fetch('/.netlify/functions/send-email', { // Endpoint updated to match backend
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(data),
+                body: JSON.stringify(formData), // Send data as JSON
             });
 
             const result = await response.json();
-            console.log('Response from server:', result); // Log the response from server
+            console.log('Response from server:', result);
 
             if (response.ok) {
                 displaySuccess();
-                updateSummary(data);
-                form.reset();  // Reset form on success
+                updateSummary(formData); // Update the summary on success
+                form.reset(); // Clear the form fields
             } else {
-                console.error('Server response not OK:', result); // Log the server response if not OK
-                displayError();
+                displayError(result.message || 'Something went wrong.');
             }
         } catch (error) {
             console.error('Form submission error:', error);
-            displayError();
+            displayError('An error occurred while submitting the form.');
         } finally {
-            loading.style.display = 'none';  // Hide loading message
+            loading.style.display = 'none'; // Hide loading spinner
         }
     });
 
@@ -64,20 +58,22 @@ document.addEventListener('DOMContentLoaded', () => {
     function displaySuccess() {
         formMessage.style.display = 'block';
         formError.style.display = 'none';
+        formMessage.textContent = 'Form submitted successfully!';
     }
 
     // Display error message
-    function displayError() {
+    function displayError(message) {
         formMessage.style.display = 'none';
         formError.style.display = 'block';
+        formError.textContent = message || 'An error occurred while processing the request.';
     }
 
     // Update summary section after successful submission
     function updateSummary(data) {
         summary.innerHTML = `
-            <strong>Name:</strong> ${data.name} <br>
-            <strong>Email:</strong> ${data.email} <br>
-            <strong>Contact Method:</strong> ${data.contact} <br>
+            <strong>Name:</strong> ${data.name}<br>
+            <strong>Email:</strong> ${data.email}<br>
+            <strong>Contact Method:</strong> ${data.contact}<br>
             ${data.phone ? `<strong>Phone:</strong> ${data.phone}` : ''}
         `;
     }
