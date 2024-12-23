@@ -1,16 +1,23 @@
+// Show/Hide phone input based on selected contact method
+document.getElementById('contact').addEventListener('change', function () {
+    const phoneInput = document.getElementById('phoneInput');
+    const phoneLabel = document.getElementById('phoneLabel');
+    if (this.value === 'phone') {
+        phoneInput.style.display = 'block';  // Show phone input
+        phoneLabel.style.display = 'block';  // Show phone label
+    } else {
+        phoneInput.style.display = 'none';  // Hide phone input
+        phoneLabel.style.display = 'none';  // Hide phone label
+    }
+});
+
 // Handle form submission
 document.getElementById('userForm').addEventListener('submit', async function (event) {
     event.preventDefault(); // Prevent default form submission
     const formData = new FormData(this); // Capture form data
-
-    // Convert FormData to a plain object
-    const data = {};
-    formData.forEach((value, key) => {
-        data[key] = value;
-    });
-
+    
     // Simple form validation (example)
-    if (!data.name || !data.email || !data.contact) {
+    if (!formData.get('name') || !formData.get('email') || !formData.get('contact')) {
         document.getElementById('formError').style.display = 'block';
         document.getElementById('formError').textContent = 'Please fill in all required fields.';
         return;
@@ -19,12 +26,13 @@ document.getElementById('userForm').addEventListener('submit', async function (e
     document.getElementById('loading').style.display = 'block'; // Show loading indicator
 
     try {
+        // Updated for Netlify function endpoint (no Vercel)
         const response = await fetch('/.netlify/functions/send-email', { // Netlify function endpoint
             method: 'POST',
-            body: JSON.stringify(data), // Send as JSON
+            body: formData,
             headers: {
                 'Accept': 'application/json',
-                'Content-Type': 'application/json' // Explicitly set to application/json
+                // 'Content-Type': 'multipart/form-data' // No need to set this header when using FormData
             }
         });
 
@@ -33,7 +41,7 @@ document.getElementById('userForm').addEventListener('submit', async function (e
         if (response.ok) {
             document.getElementById('formMessage').style.display = 'block';
             document.getElementById('formError').style.display = 'none';
-            displayFormSummary(data); // Display form submission summary
+            displayFormSummary(Object.fromEntries(formData.entries())); // Display form submission summary
             this.reset(); // Reset the form after successful submission
         } else {
             const errorText = await response.text();
@@ -47,3 +55,14 @@ document.getElementById('userForm').addEventListener('submit', async function (e
         document.getElementById('formMessage').style.display = 'none';
     }
 });
+
+// Display summary of the form submission
+function displayFormSummary(data) {
+    const summary = document.getElementById('summary');
+    summary.innerHTML = ` 
+        <strong>Name:</strong> ${data.name}<br>
+        <strong>Email:</strong> ${data.email}<br>
+        <strong>Preferred Contact Method:</strong> ${data.contact}${data.contact === 'phone' ? `<br><strong>Phone Number:</strong> ${data.phone}` : ''}<br>
+    `;
+}
+
