@@ -9,7 +9,7 @@
     <link rel="icon" href="images/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* Responsive Design Adjustments */
+        /* General Body Styles */
         body {
             font-family: 'Roboto', sans-serif;
             line-height: 1.6;
@@ -17,35 +17,75 @@
             -webkit-text-size-adjust: 100%;
             text-size-adjust: 100%;
         }
+
+        /* Hero Section */
+        .hero-section {
+            background-image: url('images/hero-background.jpg');
+            background-size: cover;
+            background-position: center;
+            height: 500px; /* Adjust height as needed */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .hero-section h1 {
+            color: white;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Header and Footer */
         header, footer {
             text-align: center;
             padding: 20px;
             background-color: #f4f4f4;
         }
+
         .header-section h1 {
             font-size: 2em;
             margin: 0.5em 0;
         }
+
         .header-section p {
             margin: 0.5em 0;
         }
+
+        /* Main Content */
         .main-content {
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
         }
+
+        /* Form Section */
         .form-section, .form-summary {
+            background-image: url('images/form-background.jpg');
+            background-size: cover;
+            background-position: center;
+            padding: 20px;
+            border-radius: 10px;
             margin-top: 2em;
         }
+
+        .form-summary {
+            background-image: url('images/form-summary-illustration.jpg');
+            background-size: cover;
+            background-position: center;
+            color: white;
+        }
+
         form {
             display: flex;
             flex-direction: column;
         }
+
         label, input, select, textarea, button {
             margin-bottom: 10px;
             padding: 10px;
             font-size: 1rem;
         }
+
         button {
             cursor: pointer;
             background-color: #007bff;
@@ -53,28 +93,38 @@
             border: none;
             transition: background-color 0.3s;
         }
+
         button:hover {
             background-color: #0056b3;
         }
+
         .divider {
             border-top: 1px solid #ccc;
             margin: 2em 0;
+            background-image: url('images/divider.jpg');
+            background-size: cover;
+            height: 1px;
         }
+
         footer p, footer a {
             color: #555;
         }
+
         .social-icons {
             display: flex;
             justify-content: center;
             gap: 10px;
         }
+
         .social-icons a {
             color: #007bff;
             text-decoration: none;
         }
+
         .social-icons a:hover {
             color: #0056b3;
         }
+
     </style>
 </head>
 <body>
@@ -82,6 +132,12 @@
         <h1>Interactive Form Data Processing</h1>
         <p>Empowering seamless user interactions with real-time feedback and data processing</p>
     </header>
+
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <h1>Welcome to the Interactive Form Handling</h1>
+    </div>
+
     <main class="main-content">
         <section id="about-me" class="about-me-section">
             <div style="text-align: center;">
@@ -99,7 +155,8 @@
                 </p>
             </div>
         </section>
-        
+
+        <!-- Contact Form Section -->
         <section id="form-section" class="form-section">
             <h2>Contact Information</h2>
             <p>Please fill out the form below to get in touch. Your information will be processed securely, and we'll get back to you shortly.</p>
@@ -134,9 +191,11 @@
                 <div id="loading" style="display: none;">Submitting... Please wait.</div>
             </form>
         </section>
-        
+
+        <!-- Divider with Background -->
         <div class="divider"></div>
-        
+
+        <!-- Form Submission Summary -->
         <section id="formSummary" class="form-summary">
             <div>
                 <h2>Form Submission Summary</h2>
@@ -144,7 +203,8 @@
             </div>
         </section>
     </main>
-    
+
+    <!-- Footer Section -->
     <footer class="footer-section">
         <p>&copy; 2024 Abdulrahman | Interactive Form Handling Project</p>
         <div class="social-icons">
@@ -158,8 +218,7 @@
             <a href="terms-conditions.html">Terms and Conditions</a>
         </p>
     </footer>
-    
-    <script src="script.js"></script> <!-- Updated to load external JavaScript -->
+
+    <script src="script.js"></script> <!-- External JavaScript -->
 </body>
 </html>
- 
