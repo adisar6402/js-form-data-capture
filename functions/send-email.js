@@ -8,7 +8,7 @@ const validator = require('validator');
 const mongoUri = process.env.MONGODB_URI;
 const dbName = 'emailstoragecluster';
 
-// Use a global MongoDB client instance
+// Use a cached MongoDB client
 let cachedClient = null;
 
 async function getMongoClient() {
@@ -19,7 +19,7 @@ async function getMongoClient() {
     return cachedClient;
 }
 
-// Create a reusable transporter object using Gmail's SMTP
+// Create a nodemailer transporter
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -28,16 +28,16 @@ const transporter = nodemailer.createTransport({
     },
 });
 
+// Lambda function handler
 exports.handler = async (event) => {
-    // Add CORS headers to all responses
+    // Set CORS headers
     const corsHeaders = {
-        'Access-Control-Allow-Origin': '*', // Adjust the origin if necessary
+        'Access-Control-Allow-Origin': '*', // Allow from all origins; adjust if needed
         'Access-Control-Allow-Methods': 'POST, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type',
-        'x-content-type-options': 'nosniff',
     };
 
-    // Handle preflight OPTIONS request
+    // Handle preflight OPTIONS requests
     if (event.httpMethod === 'OPTIONS') {
         return {
             statusCode: 200,
@@ -57,26 +57,14 @@ exports.handler = async (event) => {
 
     let data;
     try {
-        // Handle JSON format
-        if (
-            event.headers['content-type'] &&
-            event.headers['content-type'].includes('application/json')
-        ) {
-            console.log('Parsing JSON body');
-            data = JSON.parse(event.body);
-        } else {
-            return {
-                statusCode: 400,
-                headers: corsHeaders,
-                body: JSON.stringify({ message: 'Invalid Content-Type. Please send application/json' }),
-            };
-        }
+        // Parse the incoming request body
+        data = JSON.parse(event.body);
 
-        // Validate form data
+        // Validate required fields
         if (
-            validator.isEmpty(data.name) || 
-            validator.isEmpty(data.email) || 
-            validator.isEmpty(data.message) || 
+            validator.isEmpty(data.name) ||
+            validator.isEmpty(data.email) ||
+            validator.isEmpty(data.message) ||
             !validator.isEmail(data.email)
         ) {
             return {
@@ -86,24 +74,24 @@ exports.handler = async (event) => {
             };
         }
     } catch (error) {
-        console.error('Parsing error:', error.message);
+        console.error('Error parsing request body:', error.message);
         return {
             statusCode: 400,
             headers: corsHeaders,
-            body: JSON.stringify({ message: 'Invalid data format. Please ensure JSON compliance.' }),
+            body: JSON.stringify({ message: 'Invalid data format' }),
         };
     }
 
     // Email options
     const mailOptions = {
-        to: process.env.GMAIL_USER, // Recipient (your email address)
-        from: process.env.GMAIL_USER, // Sender (your email address)
-        subject: `New Form Submission by ${data.name}`,
+        to: process.env.GMAIL_USER, // Your email address
+        from: process.env.GMAIL_USER, // Sender's email
+        subject: `New Form Submission from ${data.name}`,
         text: `You have a new form submission:\n\n${JSON.stringify(data, null, 2)}`,
     };
 
     try {
-        // Send email via Gmail
+        // Send email via nodemailer
         await transporter.sendMail(mailOptions);
         console.log('Email sent successfully');
     } catch (error) {
@@ -111,30 +99,31 @@ exports.handler = async (event) => {
         return {
             statusCode: 500,
             headers: corsHeaders,
-            body: JSON.stringify({ message: 'Error sending email' }),
+            body: JSON.stringify({ message: 'Failed to send email' }),
         };
     }
 
-    // Store form data in MongoDB
+    // Save form data to MongoDB
     try {
-        const client = await getMongoClient(); // Use global client
+        const client = await getMongoClient();
         const db = client.db(dbName);
         const collection = db.collection('formSubmissions');
-
         await collection.insertOne(data);
-        console.log('Data stored in MongoDB successfully');
+
+        console.log('Form data saved to MongoDB successfully');
     } catch (error) {
-        console.error('Error storing data in MongoDB:', error.message);
+        console.error('Error saving data to MongoDB:', error.message);
         return {
             statusCode: 500,
             headers: corsHeaders,
-            body: JSON.stringify({ message: 'Error storing data in MongoDB' }),
+            body: JSON.stringify({ message: 'Failed to save form data' }),
         };
     }
 
+    // Success response
     return {
         statusCode: 201,
         headers: corsHeaders,
-        body: JSON.stringify({ message: 'Form submitted and stored successfully' }),
+        body: JSON.stringify({ message: 'Form submitted successfully' }),
     };
 };
