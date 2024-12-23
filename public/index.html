@@ -9,154 +9,110 @@
     <link rel="icon" href="images/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* General Body Styles */
+        /* Global Styles */
         body {
             font-family: 'Roboto', sans-serif;
             line-height: 1.6;
             margin: 0;
-            -webkit-text-size-adjust: 100%;
-            text-size-adjust: 100%;
-        }
-
-        /* Hero Section */
-        .hero-section {
-            background-image: url('images/hero-background.jpg');
+            background: url('images/form-background.jpg') no-repeat center center fixed;
             background-size: cover;
-            background-position: center;
-            height: 500px; /* Adjust height as needed */
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            color: #333;
         }
-
-        .hero-section h1 {
-            color: white;
-            font-size: 2.5rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-        }
-
-        /* Header and Footer */
         header, footer {
             text-align: center;
             padding: 20px;
-            background-color: #f4f4f4;
+            background: url('images/footer-background-.jpg') no-repeat center center;
+            background-size: cover;
+            color: white;
         }
-
         .header-section h1 {
-            font-size: 2em;
+            font-size: 2.5em;
             margin: 0.5em 0;
         }
-
-        .header-section p {
-            margin: 0.5em 0;
-        }
-
-        /* Main Content */
         .main-content {
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
-        }
-
-        /* Form Section */
-        .form-section, .form-summary {
-            background-image: url('images/form-background.jpg');
-            background-size: cover;
-            background-position: center;
-            padding: 20px;
+            background: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 10px;
+        }
+        .form-section {
             margin-top: 2em;
         }
-
-        .form-summary {
-            background-image: url('images/form-summary-illustration.jpg');
-            background-size: cover;
-            background-position: center;
-            color: white;
-        }
-
         form {
             display: flex;
             flex-direction: column;
+            padding: 20px;
         }
-
         label, input, select, textarea, button {
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             padding: 10px;
             font-size: 1rem;
+            border-radius: 5px;
+            border: 1px solid #ddd;
         }
-
+        input, select, textarea {
+            background: #f9f9f9;
+        }
         button {
-            cursor: pointer;
             background-color: #007bff;
             color: white;
             border: none;
             transition: background-color 0.3s;
         }
-
         button:hover {
             background-color: #0056b3;
         }
-
         .divider {
-            border-top: 1px solid #ccc;
             margin: 2em 0;
-            background-image: url('images/divider.jpg');
-            background-size: cover;
-            height: 1px;
+            height: 2px;
+            background: url('images/divider.jpg') repeat-x;
         }
-
+        .form-summary {
+            text-align: center;
+        }
         footer p, footer a {
-            color: #555;
+            color: white;
         }
-
         .social-icons {
             display: flex;
             justify-content: center;
             gap: 10px;
         }
-
         .social-icons a {
             color: #007bff;
             text-decoration: none;
+            background: white;
+            padding: 10px;
+            border-radius: 50%;
         }
-
         .social-icons a:hover {
-            color: #0056b3;
+            color: white;
+            background: #007bff;
         }
-
     </style>
 </head>
 <body>
     <header class="header-section">
-        <h1>Interactive Form Data Processing</h1>
+        <h1>Interactive Form Handling</h1>
         <p>Empowering seamless user interactions with real-time feedback and data processing</p>
     </header>
-
-    <!-- Hero Section -->
-    <div class="hero-section">
-        <h1>Welcome to the Interactive Form Handling</h1>
-    </div>
-
     <main class="main-content">
         <section id="about-me" class="about-me-section">
             <div style="text-align: center;">
                 <img src="images/photo.jpg" alt="Abdulrahman's Profile Picture" class="profile-image" style="border-radius: 50%; max-width: 150px;">
             </div>
-            <div>
-                <h2>About Me</h2>
-                <p>
-                    Hello! I'm Abdulrahman, a passionate front-end developer and AI enthusiast. 
-                    I enjoy building dynamic, user-centric websites that seamlessly blend functionality and creativity. 
-                    Currently, I'm honing my skills in JavaScript and data handling, aiming to create more interactive and efficient user experiences.
-                    <br><br>
-                    I believe in continuous learning and love exploring new technologies that push the boundaries of web development. 
-                    Outside coding, I’m deeply involved in climate action projects, advocating for sustainability through technology and education.
-                </p>
-            </div>
+            <h2>About Me</h2>
+            <p>
+                Hello! I'm Abdulrahman, a passionate front-end developer and AI enthusiast. 
+                I enjoy building dynamic, user-centric websites that seamlessly blend functionality and creativity. 
+                Currently, I'm honing my skills in JavaScript and data handling, aiming to create more interactive and efficient user experiences.
+                <br><br>
+                Outside coding, I’m deeply involved in climate action projects, advocating for sustainability through technology and education.
+            </p>
         </section>
-
-        <!-- Contact Form Section -->
+        
         <section id="form-section" class="form-section">
             <h2>Contact Information</h2>
             <p>Please fill out the form below to get in touch. Your information will be processed securely, and we'll get back to you shortly.</p>
@@ -185,40 +141,26 @@
                 </label>
                 
                 <button type="submit" id="submitBtn">Submit</button>
-                
-                <p id="formMessage" aria-live="polite" style="color: green; display: none;">Thank you! Your submission was received successfully.</p>
-                <p id="formError" aria-live="polite" style="color: red; display: none;">Oops! Something went wrong. Please try again later.</p>
-                <div id="loading" style="display: none;">Submitting... Please wait.</div>
             </form>
         </section>
-
-        <!-- Divider with Background -->
+        
         <div class="divider"></div>
-
-        <!-- Form Submission Summary -->
+        
         <section id="formSummary" class="form-summary">
-            <div>
-                <h2>Form Submission Summary</h2>
-                <p id="summary">Upon successful submission, your form details will appear here.</p>
-            </div>
+            <img src="images/form-summary-illustration.jpg" alt="Form Summary Illustration" style="max-width: 100%;">
+            <h2>Form Submission Summary</h2>
+            <p id="summary">Upon successful submission, your form details will appear here.</p>
         </section>
     </main>
-
-    <!-- Footer Section -->
+    
     <footer class="footer-section">
         <p>&copy; 2024 Abdulrahman | Interactive Form Handling Project</p>
         <div class="social-icons">
-            <a href="https://github.com/adisar6402" target="_blank" title="GitHub Profile"><i class="fab fa-github"></i> GitHub</a>
-            <a href="https://twitter.com/RahmanAdis42469" target="_blank" title="Twitter Profile"><i class="fab fa-twitter"></i> Twitter</a>
-            <a href="https://www.linkedin.com/in/abdulrahman--engineering-ai-ml/" target="_blank" title="LinkedIn Profile"><i class="fab fa-linkedin"></i> LinkedIn</a>
-            <a href="https://facebook.com/Abdulrahman.Adisa.Amuda2000" target="_blank" title="Facebook Profile"><i class="fab fa-facebook"></i> Facebook</a>
+            <a href="https://github.com/adisar6402" target="_blank" title="GitHub Profile"><i class="fab fa-github"></i></a>
+            <a href="https://twitter.com/RahmanAdis42469" target="_blank" title="Twitter Profile"><i class="fab fa-twitter"></i></a>
+            <a href="https://www.linkedin.com/in/abdulrahman--engineering-ai-ml/" target="_blank" title="LinkedIn Profile"><i class="fab fa-linkedin"></i></a>
+            <a href="https://facebook.com/Abdulrahman.Adisa.Amuda2000" target="_blank" title="Facebook Profile"><i class="fab fa-facebook"></i></a>
         </div>
-        <p>
-            <a href="privacy-policy.html">Privacy Policy</a> |
-            <a href="terms-conditions.html">Terms and Conditions</a>
-        </p>
     </footer>
-
-    <script src="script.js"></script> <!-- External JavaScript -->
 </body>
 </html>
