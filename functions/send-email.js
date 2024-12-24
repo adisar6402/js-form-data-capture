@@ -50,6 +50,7 @@ exports.handler = async (event) => {
     let data;
     try {
         data = JSON.parse(event.body);
+        console.log('Received data:', data);
 
         if (
             validator.isEmpty(data.name) ||
