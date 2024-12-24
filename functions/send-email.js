@@ -1,4 +1,3 @@
-const querystring = require('querystring');
 const nodemailer = require('nodemailer');
 const { MongoClient } = require('mongodb');
 require('dotenv').config();
@@ -61,4 +60,65 @@ exports.handler = async (event) => {
             return {
                 statusCode: 400,
                 headers: corsHeaders,
-                body: JSON.stringify({ message: 'Invalid form data', received
+                body: JSON.stringify({ message: 'Invalid form data', receivedData: data }),
+            };
+        }
+
+        if (data.contact === 'phone' && validator.isEmpty(data.phone)) {
+            return {
+                statusCode: 400,
+                headers: corsHeaders,
+                body: JSON.stringify({ message: 'Phone number required for phone contact method', receivedData: data }),
+            };
+        }
+
+    } catch (error) {
+        console.error('Error parsing request body:', error.message);
+        return {
+            statusCode: 400,
+            headers: corsHeaders,
+            body: JSON.stringify({ message: 'Invalid data format' }),
+        };
+    }
+
+    const mailOptions = {
+        to: process.env.GMAIL_USER,
+        from: process.env.GMAIL_USER,
+        subject: `New Form Submission from ${data.name}`,
+        text: `You have a new form submission:\n\n${JSON.stringify(data, null, 2)}`,
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log('Email sent successfully');
+    } catch (error) {
+        console.error('Error sending email:', error.message);
+        return {
+            statusCode: 500,
+            headers: corsHeaders,
+            body: JSON.stringify({ message: 'Failed to send email' }),
+        };
+    }
+
+    try {
+        const client = await getMongoClient();
+        const db = client.db(dbName);
+        const collection = db.collection('formSubmissions');
+        await collection.insertOne(data);
+
+        console.log('Form data saved to MongoDB successfully');
+    } catch (error) {
+        console.error('Error saving data to MongoDB:', error.message);
+        return {
+            statusCode: 500,
+            headers: corsHeaders,
+            body: JSON.stringify({ message: 'Failed to save form data' }),
+        };
+    }
+
+    return {
+        statusCode: 201,
+        headers: corsHeaders,
+        body: JSON.stringify({ message: 'Form submitted successfully' }),
+    };
+};
