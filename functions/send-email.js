@@ -47,10 +47,12 @@ exports.handler = async (event) => {
         };
     }
 
+    console.log('Raw event.body:', event.body); // Log raw body
+
     let data;
     try {
         data = JSON.parse(event.body);
-        console.log('Received data:', data);
+        console.log('Parsed data:', data); // Log parsed data
 
         if (
             validator.isEmpty(data.name) ||
