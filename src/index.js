@@ -24,7 +24,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Capture form data
         const formData = Object.fromEntries(new FormData(form).entries()); // Convert FormData to object
-        console.log('Form data to be sent:', JSON.stringify(formData));
 
         try {
             const response = await fetch('/.netlify/functions/send-email', { // Endpoint updated to match backend
@@ -36,15 +35,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify(formData), // Send data as JSON
             });
 
-            const result = await response.json();
-            console.log('Response from server:', result);
-
             if (response.ok) {
+                const result = await response.json();
+                console.log('Response from server:', result);
                 displaySuccess();
                 updateSummary(formData); // Update the summary on success
                 form.reset(); // Clear the form fields
             } else {
-                displayError(result.message || 'Something went wrong.');
+                const errorText = await response.text();
+                console.error('Form submission failed:', response.status, errorText);
+                displayError(`Error: ${response.status} - ${errorText}`);
             }
         } catch (error) {
             console.error('Form submission error:', error);

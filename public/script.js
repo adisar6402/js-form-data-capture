@@ -3,11 +3,11 @@ document.getElementById('contact').addEventListener('change', function () {
     const phoneInput = document.getElementById('phoneInput');
     const phoneLabel = document.getElementById('phoneLabel');
     if (this.value === 'phone') {
-        phoneInput.style.display = 'block';  // Show phone input
-        phoneLabel.style.display = 'block';  // Show phone label
+        phoneInput.style.display = 'block'; // Show phone input
+        phoneLabel.style.display = 'block'; // Show phone label
     } else {
-        phoneInput.style.display = 'none';  // Hide phone input
-        phoneLabel.style.display = 'none';  // Hide phone label
+        phoneInput.style.display = 'none'; // Hide phone input
+        phoneLabel.style.display = 'none'; // Hide phone label
     }
 });
 
@@ -16,8 +16,11 @@ document.getElementById('userForm').addEventListener('submit', async function (e
     event.preventDefault(); // Prevent default form submission
     const formData = new FormData(this); // Capture form data
 
+    // Convert FormData to JSON object
+    const formObject = Object.fromEntries(formData.entries());
+
     // Simple form validation (example)
-    if (!formData.get('name') || !formData.get('email') || !formData.get('contact')) {
+    if (!formObject.name || !formObject.email || !formObject.contact) {
         document.getElementById('formError').style.display = 'block';
         document.getElementById('formError').textContent = 'Please fill in all required fields.';
         return;
@@ -26,9 +29,6 @@ document.getElementById('userForm').addEventListener('submit', async function (e
     document.getElementById('loading').style.display = 'block'; // Show loading indicator
 
     try {
-        // Convert FormData to JSON object
-        const formObject = Object.fromEntries(formData.entries());
-
         // Send the data as JSON
         const response = await fetch('/.netlify/functions/send-email', { // Netlify function endpoint
             method: 'POST',
@@ -70,4 +70,3 @@ function displayFormSummary(data) {
         <strong>Preferred Contact Method:</strong> ${data.contact}${data.contact === 'phone' ? `<br><strong>Phone Number:</strong> ${data.phone}` : ''}<br>
     `;
 }
-
