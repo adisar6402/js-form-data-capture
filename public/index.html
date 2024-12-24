@@ -21,39 +21,35 @@
         header, footer {
             text-align: center;
             padding: 20px;
-            background: url('images/footer-background-.jpg') no-repeat center center;
-            background-size: cover;
+            background: rgba(0, 0, 0, 0.7);
             color: white;
         }
-        .header-section h1 {
+        header h1 {
             font-size: 2.5em;
-            margin: 0.5em 0;
         }
         .main-content {
             max-width: 800px;
-            margin: 0 auto;
+            margin: 20px auto;
             padding: 20px;
             background: white;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 10px;
         }
-        .form-section {
-            margin-top: 2em;
-        }
         form {
             display: flex;
             flex-direction: column;
-            padding: 20px;
         }
-        label, input, select, textarea, button {
+        label {
+            font-weight: bold;
+        }
+        input, select, textarea, button {
             margin-bottom: 15px;
             padding: 10px;
-            font-size: 1rem;
             border-radius: 5px;
             border: 1px solid #ddd;
         }
-        input, select, textarea {
-            background: #f9f9f9;
+        input:focus, select:focus, textarea:focus {
+            outline: 2px solid #007bff;
         }
         button {
             background-color: #007bff;
@@ -64,44 +60,31 @@
         button:hover {
             background-color: #0056b3;
         }
-        .divider {
-            margin: 2em 0;
-            height: 2px;
-            background: url('images/divider.jpg') repeat-x;
-        }
-        .form-summary {
-            text-align: center;
-        }
-        footer p, footer a {
-            color: white;
-        }
-        .social-icons {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-        }
         .social-icons a {
+            display: inline-block;
+            margin: 5px;
             color: #007bff;
             text-decoration: none;
-            background: white;
             padding: 10px;
             border-radius: 50%;
+            background: white;
+            transition: background-color 0.3s, color 0.3s;
         }
         .social-icons a:hover {
             color: white;
-            background: #007bff;
+            background-color: #007bff;
         }
     </style>
 </head>
 <body>
-    <header class="header-section">
+    <header>
         <h1>Interactive Form Handling</h1>
         <p>Empowering seamless user interactions with real-time feedback and data processing</p>
     </header>
     <main class="main-content">
-        <section id="about-me" class="about-me-section">
-            <div style="text-align: center;">
-                <img src="images/photo.jpg" alt="Abdulrahman's Profile Picture" class="profile-image" style="border-radius: 50%; max-width: 150px;">
+        <section id="about-me">
+            <div>
+                <img src="images/photo.jpg" alt="Abdulrahman's Profile Picture" style="border-radius: 50%; max-width: 150px;">
             </div>
             <h2>About Me</h2>
             <p>
@@ -112,55 +95,61 @@
                 Outside coding, I’m deeply involved in climate action projects, advocating for sustainability through technology and education.
             </p>
         </section>
-        
-        <section id="form-section" class="form-section">
+        <section id="form-section">
             <h2>Contact Information</h2>
-            <p>Please fill out the form below to get in touch. Your information will be processed securely, and we'll get back to you shortly.</p>
             <form id="userForm" action="/.netlify/functions/send-email" method="post" enctype="application/x-www-form-urlencoded" novalidate>
                 <label for="name">Name:</label>
-                <input type="text" id="name" name="name" placeholder="Enter your name" required autocomplete="name">
-                
+                <input type="text" id="name" name="name" placeholder="Enter your name" required>
+
                 <label for="email">Email:</label>
-                <input type="email" id="email" name="email" placeholder="Enter your email" required autocomplete="email">
-                
+                <input type="email" id="email" name="email" placeholder="Enter your email" required>
+
                 <label for="contact">Preferred Contact Method:</label>
                 <select id="contact" name="contact" required>
                     <option value="" disabled selected>Select a contact method</option>
                     <option value="email">Email</option>
                     <option value="phone">Phone</option>
                 </select>
-                
-                <label for="phoneInput" style="display: none;" id="phoneLabel">Phone Number:</label>
-                <input type="tel" id="phoneInput" name="phone" style="display: none;" placeholder="Enter your phone number" autocomplete="tel">
-                
+
+                <label for="phoneInput" id="phoneLabel" style="display: none;">Phone Number:</label>
+                <input type="tel" id="phoneInput" name="phone" placeholder="Enter your phone number" style="display: none;">
+
                 <label for="message">Message:</label>
                 <textarea id="message" name="message" rows="4" placeholder="Enter your message" required></textarea>
 
                 <label>
                     <input type="checkbox" id="terms" name="terms" required> I accept the terms and conditions
                 </label>
-                
+
                 <button type="submit" id="submitBtn">Submit</button>
             </form>
         </section>
-        
-        <div class="divider"></div>
-        
-        <section id="formSummary" class="form-summary">
-            <img src="images/form-summary-illustration.jpg" alt="Form Summary Illustration" style="max-width: 100%;">
-            <h2>Form Submission Summary</h2>
-            <p id="summary">Upon successful submission, your form details will appear here.</p>
-        </section>
     </main>
-    
-    <footer class="footer-section">
+    <footer>
         <p>&copy; 2024 Abdulrahman | Interactive Form Handling Project</p>
         <div class="social-icons">
-            <a href="https://github.com/adisar6402" target="_blank" title="GitHub Profile"><i class="fab fa-github"></i></a>
-            <a href="https://twitter.com/RahmanAdis42469" target="_blank" title="Twitter Profile"><i class="fab fa-twitter"></i></a>
-            <a href="https://www.linkedin.com/in/abdulrahman--engineering-ai-ml/" target="_blank" title="LinkedIn Profile"><i class="fab fa-linkedin"></i></a>
-            <a href="https://facebook.com/Abdulrahman.Adisa.Amuda2000" target="_blank" title="Facebook Profile"><i class="fab fa-facebook"></i></a>
+            <a href="https://github.com/adisar6402" title="GitHub Profile" target="_blank"><i class="fab fa-github"></i></a>
+            <a href="https://twitter.com/RahmanAdis42469" title="Twitter Profile" target="_blank"><i class="fab fa-twitter"></i></a>
+            <a href="https://www.linkedin.com/in/abdulrahman--engineering-ai-ml/" title="LinkedIn Profile" target="_blank"><i class="fab fa-linkedin"></i></a>
+            <a href="https://facebook.com/Abdulrahman.Adisa.Amuda2000" title="Facebook Profile" target="_blank"><i class="fab fa-facebook"></i></a>
         </div>
     </footer>
+    <script>
+        const contactSelect = document.getElementById('contact');
+        const phoneLabel = document.getElementById('phoneLabel');
+        const phoneInput = document.getElementById('phoneInput');
+
+        contactSelect.addEventListener('change', function () {
+            if (this.value === 'phone') {
+                phoneLabel.style.display = 'block';
+                phoneInput.style.display = 'block';
+                phoneInput.required = true;
+            } else {
+                phoneLabel.style.display = 'none';
+                phoneInput.style.display = 'none';
+                phoneInput.required = false;
+            }
+        });
+    </script>
 </body>
 </html>
