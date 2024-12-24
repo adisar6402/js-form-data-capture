@@ -47,12 +47,12 @@ exports.handler = async (event) => {
         };
     }
 
-    console.log('Raw event.body:', event.body); // Log raw body
+    console.log('Raw event.body:', event.body);
 
     let data;
     try {
         data = JSON.parse(event.body);
-        console.log('Parsed data:', data); // Log parsed data
+        console.log('Parsed data:', data);
 
         if (
             validator.isEmpty(data.name) ||
@@ -64,14 +64,6 @@ exports.handler = async (event) => {
                 statusCode: 400,
                 headers: corsHeaders,
                 body: JSON.stringify({ message: 'Invalid form data', receivedData: data }),
-            };
-        }
-
-        if (data.contact === 'phone' && validator.isEmpty(data.phone)) {
-            return {
-                statusCode: 400,
-                headers: corsHeaders,
-                body: JSON.stringify({ message: 'Phone number required for phone contact method', receivedData: data }),
             };
         }
 
