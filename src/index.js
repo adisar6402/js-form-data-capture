@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const formData = Object.fromEntries(new FormData(form).entries()); // Convert FormData to object
 
         try {
-            const response = await fetch('/.netlify/functions/send-email', { // Endpoint updated to match backend
+            const response = await fetch('/.netlify/functions/submit-form', { // Updated backend endpoint
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
