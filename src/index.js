@@ -26,8 +26,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const formData = Object.fromEntries(new FormData(form).entries()); // Convert FormData to object
 
         try {
-            // Updated backend endpoint to use live Netlify URL
-            const response = await fetch('https://js-form-data-capture.netlify.app/.netlify/functions/submit-form', { // Live Netlify endpoint
+            // Fetch data to the server with the required endpoint:
+            const response = await fetch('http://localhost:5000/submit-form/a7b7eb09-1dda-412d-b4b0-df098a51b49f', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
