@@ -3,11 +3,11 @@
   functions = "functions"  # Directory where the functions are defined
 
 [[redirects]]
-  from = "/api/*"  # If you're using /api endpoints for your function routes
-  to = "/.netlify/functions/:splat"  # Matches the function name automatically
+  from = "/.netlify/functions/*"
+  to = "/.netlify/functions/:splat"
   status = 200
 
 [[redirects]]
-  from = "/*"  # All other requests should redirect to the frontend (in case you have a static front end)
+  from = "/*"
   to = "/index.html"
   status = 200
