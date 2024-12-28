@@ -1,17 +1,19 @@
+
 const mongoose = require("mongoose");
 const nodemailer = require("nodemailer");
+const { MongoClient } = require("mongodb");
 
 const formSubmitHandler = async (event) => {
   try {
-    // Allowing CORS
+    // Handle CORS
     event.setHeaders({
       "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE",
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type",
     });
 
+    // Preflight request
     if (event.httpMethod === "OPTIONS") {
-      // Preflight requests can return successfully
       return { statusCode: 200, body: "" };
     }
 
@@ -29,7 +31,7 @@ const formSubmitHandler = async (event) => {
       const transporter = nodemailer.createTransport({
         service: "gmail",
         auth: {
-          user: process.env.GMAIL_USER,       // Gmail email
+          user: process.env.GMAIL_USER,  // Gmail email
           pass: process.env.GMAIL_APP_PASSWORD, // Gmail app password
         },
       });
@@ -52,7 +54,6 @@ const formSubmitHandler = async (event) => {
       await transporter.sendMail(mailOptions);
 
       // MongoDB connection
-      const { MongoClient } = require("mongodb");
       const uri = process.env.MONGODB_URI;
 
       const client = new MongoClient(uri, {

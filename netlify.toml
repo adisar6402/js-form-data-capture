@@ -1,5 +1,5 @@
 [build]
-  publish = "public"  # The directory to publish (if you have any frontend code)
+  publish = "public"  # The directory to publish
   functions = "functions"  # Directory where the functions are defined
 
 [[redirects]]

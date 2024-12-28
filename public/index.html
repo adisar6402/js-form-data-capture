@@ -147,7 +147,7 @@
         <section id="form-section" class="form-section">
             <h2>Contact Information</h2>
             <p>Please fill out the form below to get in touch. Your information will be processed securely, and we'll get back to you shortly.</p>
-            <form id="userForm" method="post" action="/.netlify/functions/form-submit" enctype="application/x-www-form-urlencoded" novalidate>
+            <form id="userForm" method="POST" action="/.netlify/functions/form-submit" enctype="application/x-www-form-urlencoded" novalidate>
                 <label for="name">Name:</label>
                 <input type="text" id="name" name="name" placeholder="Enter your name" required autocomplete="name">
 
@@ -161,40 +161,38 @@
                     <option value="phone">Phone</option>
                 </select>
 
-                <label for="phoneInput" style="display: none;" id="phoneLabel">Phone Number:</label>
-                <input type="tel" id="phoneInput" name="phone" style="display: none;" placeholder="Enter your phone number" autocomplete="tel">
-
+                <label for="phoneInput" style="display: none;" id="phoneLabel">Phone:</label>
+                <input type="tel" id="phoneInput" name="phone" placeholder="Enter your phone number" style="display: none;" autocomplete="tel">
+                
                 <label for="message">Message:</label>
-                <textarea id="message" name="message" rows="4" placeholder="Enter your message" required></textarea>
-
-                <label>
-                    <input type="checkbox" id="terms" name="terms" required> I accept the terms and conditions
-                </label>
-
-                <button type="submit" id="submitBtn">Submit</button>
+                <textarea id="message" name="message" rows="5" placeholder="Type your message here" required></textarea>
+                <button type="submit">Submit</button>
             </form>
         </section>
-
-        <div class="divider"></div>
-
-        <section id="formSummary" class="form-summary">
-            <img src="images/form-summary-illustration.jpg" alt="Form Summary Illustration" style="max-width: 100%;">
-            <h2>Form Submission Summary</h2>
-            <p id="summary">Upon successful submission, your form details will appear here.</p>
-        </section>
     </main>
-
-    <footer class="footer-section">
-        <p>&copy; 2024 Abdulrahman | Interactive Form Handling Project</p>
+    <footer>
+        <p>&copy; 2024 Abdulrahman. All rights reserved.</p>
         <div class="social-icons">
-            <a href="https://github.com/adisar6402" target="_blank" title="GitHub Profile"><i class="fab fa-github"></i></a>
-            <a href="https://twitter.com/RahmanAdis42469" target="_blank" title="Twitter Profile"><i class="fab fa-twitter"></i></a>
-            <a href="https://www.linkedin.com/in/abdulrahman--engineering-ai-ml/" target="_blank" title="LinkedIn Profile"><i class="fab fa-linkedin"></i></a>
-            <a href="https://facebook.com/Abdulrahman.Adisa.Amuda2000" target="_blank" title="Facebook Profile"><i class="fab fa-facebook"></i></a>
+            <a href="https://github.com/" target="_blank" title="Github">
+                <i class="fab fa-github"></i>
+            </a>
+            <a href="https://twitter.com/" target="_blank" title="Twitter">
+                <i class="fab fa-twitter"></i>
+            </a>
         </div>
     </footer>
-
-    <script src="index.js"></script> <!-- Assuming you have the js file -->
+    <script>
+        document.getElementById('contact').addEventListener('change', function() {
+            var phoneInput = document.getElementById('phoneInput');
+            var phoneLabel = document.getElementById('phoneLabel');
+            if (this.value === 'phone') {
+                phoneInput.style.display = 'block';
+                phoneLabel.style.display = 'block';
+            } else {
+                phoneInput.style.display = 'none';
+                phoneLabel.style.display = 'none';
+            }
+        });
+    </script>
 </body>
-
 </html>
