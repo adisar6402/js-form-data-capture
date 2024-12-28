@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,17 +19,21 @@
             background-size: cover;
             color: #333;
         }
-        header, footer {
+
+        header,
+        footer {
             text-align: center;
             padding: 20px;
             background: url('images/footer-background-.jpg') no-repeat center center;
             background-size: cover;
             color: white;
         }
+
         .header-section h1 {
             font-size: 2.5em;
             margin: 0.5em 0;
         }
+
         .main-content {
             max-width: 800px;
             margin: 0 auto;
@@ -37,49 +42,67 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 10px;
         }
+
         .form-section {
             margin-top: 2em;
         }
+
         form {
             display: flex;
             flex-direction: column;
             padding: 20px;
         }
-        label, input, select, textarea, button {
+
+        label,
+        input,
+        select,
+        textarea,
+        button {
             margin-bottom: 15px;
             padding: 10px;
             font-size: 1rem;
             border-radius: 5px;
             border: 1px solid #ddd;
         }
-        input, select, textarea {
+
+        input,
+        select,
+        textarea {
             background: #f9f9f9;
         }
+
         button {
             background-color: #007bff;
             color: white;
             border: none;
             transition: background-color 0.3s;
         }
+
         button:hover {
             background-color: #0056b3;
         }
+
         .divider {
             margin: 2em 0;
             height: 2px;
             background: url('images/divider.jpg') repeat-x;
         }
+
         .form-summary {
             text-align: center;
         }
-        footer p, footer a {
+
+        footer p,
+        footer a {
             color: white;
         }
+
         .social-icons {
             display: flex;
             justify-content: center;
             gap: 10px;
         }
+
         .social-icons a {
             color: #007bff;
             text-decoration: none;
@@ -87,10 +110,12 @@
             padding: 10px;
             border-radius: 50%;
         }
+
         .social-icons a:hover {
             color: white;
             background: #007bff;
         }
+
         /* Image fix */
         .profile-image {
             max-width: 150px;
@@ -98,6 +123,7 @@
         }
     </style>
 </head>
+
 <body>
     <header class="header-section">
         <h1>Interactive Form Handling</h1>
@@ -110,54 +136,54 @@
             </div>
             <h2>About Me</h2>
             <p>
-                Hello! I'm Abdulrahman, a passionate front-end developer and AI enthusiast. 
-                I enjoy building dynamic, user-centric websites that seamlessly blend functionality and creativity. 
+                Hello! I'm Abdulrahman, a passionate front-end developer and AI enthusiast.
+                I enjoy building dynamic, user-centric websites that seamlessly blend functionality and creativity.
                 Currently, I'm honing my skills in JavaScript and data handling, aiming to create more interactive and efficient user experiences.
                 <br><br>
                 Outside coding, I’m deeply involved in climate action projects, advocating for sustainability through technology and education.
             </p>
         </section>
-        
+
         <section id="form-section" class="form-section">
             <h2>Contact Information</h2>
             <p>Please fill out the form below to get in touch. Your information will be processed securely, and we'll get back to you shortly.</p>
-            <form id="userForm" method="post" action="/.netlify/functions/form-submit/a7b7eb09-1dda-412d-b4b0-df098a51b49f" enctype="application/x-www-form-urlencoded" novalidate>
+            <form id="userForm" method="post" action="/.netlify/functions/form-submit" enctype="application/x-www-form-urlencoded" novalidate>
                 <label for="name">Name:</label>
                 <input type="text" id="name" name="name" placeholder="Enter your name" required autocomplete="name">
-                
+
                 <label for="email">Email:</label>
                 <input type="email" id="email" name="email" placeholder="Enter your email" required autocomplete="email">
-                
+
                 <label for="contact">Preferred Contact Method:</label>
                 <select id="contact" name="contact" required>
                     <option value="" disabled selected>Select a contact method</option>
                     <option value="email">Email</option>
                     <option value="phone">Phone</option>
                 </select>
-                
+
                 <label for="phoneInput" style="display: none;" id="phoneLabel">Phone Number:</label>
                 <input type="tel" id="phoneInput" name="phone" style="display: none;" placeholder="Enter your phone number" autocomplete="tel">
-                
+
                 <label for="message">Message:</label>
                 <textarea id="message" name="message" rows="4" placeholder="Enter your message" required></textarea>
 
                 <label>
                     <input type="checkbox" id="terms" name="terms" required> I accept the terms and conditions
                 </label>
-                
+
                 <button type="submit" id="submitBtn">Submit</button>
             </form>
         </section>
-        
+
         <div class="divider"></div>
-        
+
         <section id="formSummary" class="form-summary">
             <img src="images/form-summary-illustration.jpg" alt="Form Summary Illustration" style="max-width: 100%;">
             <h2>Form Submission Summary</h2>
             <p id="summary">Upon successful submission, your form details will appear here.</p>
         </section>
     </main>
-    
+
     <footer class="footer-section">
         <p>&copy; 2024 Abdulrahman | Interactive Form Handling Project</p>
         <div class="social-icons">
@@ -170,4 +196,5 @@
 
     <script src="index.js"></script> <!-- Assuming you have the js file -->
 </body>
+
 </html>

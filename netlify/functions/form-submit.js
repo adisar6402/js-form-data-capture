@@ -1,77 +1,104 @@
-require('dotenv').config();  // Ensure environment variables are loaded
+const mongoose = require("mongoose");
+const nodemailer = require("nodemailer");
 
-const mongoose = require('mongoose');
-const nodemailer = require('nodemailer');
-
-// The function handler for the form submission
-const handler = async (event, context) => {
-  // Set up MongoDB connection
-  await mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
-
-  // Define the schema and model for form submissions
-  const formSchema = new mongoose.Schema({
-      name: String,
-      email: String,
-      contact: String,
-      message: String,
-      date: { type: Date, default: Date.now },
-  });
-
-  const FormSubmission = mongoose.model('FormSubmission', formSchema);
-
+const formSubmitHandler = async (event) => {
   try {
-    // Only handle POST requests for form submission
-    if (event.httpMethod === 'POST') {
-      const { name, email, message, contact } = JSON.parse(event.body); // Parse the form data
+    // Allowing CORS
+    event.setHeaders({
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE",
+      "Access-Control-Allow-Headers": "Content-Type",
+    });
 
-      // Save form data to MongoDB
-      const newSubmission = new FormSubmission({ name, email, message, contact });
-      const savedSubmission = await newSubmission.save();
+    if (event.httpMethod === "OPTIONS") {
+      // Preflight requests can return successfully
+      return { statusCode: 200, body: "" };
+    }
 
-      // Set up Nodemailer for email notification
+    if (event.httpMethod === "POST") {
+      const { name, email, contact, phone, message } = JSON.parse(event.body);
+
+      if (!name || !email || !contact || !message) {
+        return {
+          statusCode: 400,
+          body: JSON.stringify({ error: "Required fields are missing" }),
+        };
+      }
+
+      // Create email transporter
       const transporter = nodemailer.createTransport({
-        service: 'gmail',
+        service: "gmail",
         auth: {
-          user: process.env.GMAIL_USER,
-          pass: process.env.GMAIL_APP_PASSWORD,
+          user: process.env.GMAIL_USER,       // Gmail email
+          pass: process.env.GMAIL_APP_PASSWORD, // Gmail app password
         },
       });
 
-      // Email details for the submitted form
+      // Email content
       const mailOptions = {
         from: process.env.GMAIL_USER,
-        to: process.env.GMAIL_USER,
-        subject: 'New Form Submission',
-        text: `Name: ${name}\nEmail: ${email}\nMessage: ${message}\nPreferred Contact: ${contact}`,
+        to: process.env.GMAIL_USER, // Send email to self for notification
+        subject: "New Form Submission",
+        text: `
+          Name: ${name}\n
+          Email: ${email}\n
+          Preferred Contact: ${contact}\n
+          Phone: ${phone || "N/A"}\n
+          Message: ${message}
+        `,
       };
 
-      // Send the email notification
-      const emailResponse = await transporter.sendMail(mailOptions);
+      // Send email
+      await transporter.sendMail(mailOptions);
 
-      // Return response in JSON
+      // MongoDB connection
+      const { MongoClient } = require("mongodb");
+      const uri = process.env.MONGODB_URI;
+
+      const client = new MongoClient(uri, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      });
+
+      // Connect to MongoDB
+      await client.connect();
+
+      // Insert form data into MongoDB collection
+      const database = client.db();
+      const collection = database.collection("form-submissions");
+
+      const submission = {
+        name,
+        email,
+        contact,
+        phone: phone || "N/A",
+        message,
+        submittedAt: new Date(),
+      };
+
+      await collection.insertOne(submission);
+
+      // Close database connection
+      await client.close();
+
       return {
         statusCode: 200,
-        body: JSON.stringify({
-          message: 'Form submitted successfully!',
-          emailResponse: emailResponse.response,
-          savedSubmission,
-        }),
+        body: JSON.stringify({ message: "Form submitted successfully!" }),
       };
     }
 
-    // Handle unsupported methods
     return {
-      statusCode: 405,
-      body: JSON.stringify({ message: 'Only POST method is supported.' }),
+      statusCode: 405, // Method Not Allowed
+      body: JSON.stringify({ error: "Method not allowed" }),
     };
   } catch (error) {
-    console.error('Error processing form submission:', error);
+    console.error("Form submission failed:", error);
+
     return {
       statusCode: 500,
-      body: JSON.stringify({ message: 'Error submitting form', error: error.message }),
+      body: JSON.stringify({ error: "Internal server error" }),
     };
   }
 };
 
-// Export the handler for Netlify functions
-exports.handler = handler;
+exports.handler = formSubmitHandler;
