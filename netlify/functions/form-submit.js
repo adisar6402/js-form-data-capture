@@ -81,4 +81,3 @@ const formSubmitHandler = async (event) => {
 };
 
 exports.handler = formSubmitHandler;
-
