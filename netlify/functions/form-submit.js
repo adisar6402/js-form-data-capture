@@ -4,29 +4,40 @@ const { MongoClient } = require("mongodb");
 
 const formSubmitHandler = async (event) => {
   try {
-    event.setHeaders({
+    // Set CORS headers in the response
+    const corsHeaders = {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type, Authorization",
-    });
+    };
 
+    // Handle OPTIONS preflight request
     if (event.httpMethod === "OPTIONS") {
-      return { statusCode: 200, body: "" };
+      return {
+        statusCode: 200,
+        headers: corsHeaders,
+        body: "",
+      };
     }
 
+    // Handle POST request
     if (event.httpMethod === "POST") {
       console.log("POST request received.");
 
+      // Parse request body
       const { name, email, contact, phone, message } = JSON.parse(event.body);
+
+      // Validate required fields
       if (!name || !email || !contact || !message) {
         console.error("Missing required fields.");
         return {
           statusCode: 400,
+          headers: corsHeaders,
           body: JSON.stringify({ error: "Required fields are missing" }),
         };
       }
 
-      // Email Setup
+      // Configure Nodemailer
       const transporter = nodemailer.createTransport({
         service: "gmail",
         auth: {
@@ -44,18 +55,18 @@ const formSubmitHandler = async (event) => {
         }\nMessage: ${message}`,
       };
 
+      // Send email
       await transporter.sendMail(mailOptions);
       console.log("Email sent successfully.");
 
-      // MongoDB Setup
+      // Configure MongoDB
       const uri = process.env.MONGODB_URI;
       const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
+      // Connect to MongoDB and insert data
       await client.connect();
       console.log("Connected to MongoDB.");
-
-      // Use the correct database name
-      const database = client.db("EmailStorageCluster");
+      const database = client.db("EmailStorageCluster"); // Use your database name
       const collection = database.collection("form-submissions");
 
       await collection.insertOne({
@@ -70,13 +81,27 @@ const formSubmitHandler = async (event) => {
       await client.close();
       console.log("Form data stored successfully.");
 
-      return { statusCode: 200, body: JSON.stringify({ message: "Form submitted successfully!" }) };
+      // Return success response
+      return {
+        statusCode: 200,
+        headers: corsHeaders,
+        body: JSON.stringify({ message: "Form submitted successfully!" }),
+      };
     }
 
-    return { statusCode: 405, body: JSON.stringify({ error: "Method not allowed" }) };
+    // Method not allowed
+    return {
+      statusCode: 405,
+      headers: corsHeaders,
+      body: JSON.stringify({ error: "Method not allowed" }),
+    };
   } catch (error) {
     console.error("Form submission failed:", error);
-    return { statusCode: 500, body: JSON.stringify({ error: error.message, stack: error.stack }) };
+    return {
+      statusCode: 500,
+      headers: corsHeaders,
+      body: JSON.stringify({ error: "Internal server error" }),
+    };
   }
 };
 
