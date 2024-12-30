@@ -147,7 +147,7 @@
         <section id="form-section" class="form-section">
             <h2>Contact Information</h2>
             <p>Please fill out the form below to get in touch. Your information will be processed securely, and we'll get back to you shortly.</p>
-            <form id="userForm" method="POST" action="/api/form-submit" enctype="application/x-www-form-urlencoded" novalidate>
+            <form id="userForm" novalidate>
                 <label for="name">Name:</label>
                 <input type="text" id="name" name="name" placeholder="Enter your name" required autocomplete="name">
 
@@ -192,6 +192,36 @@
                 phoneInput.style.display = 'none';
                 phoneLabel.style.display = 'none';
             }
+        });
+
+        document.getElementById('userForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission behavior
+
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                contact: document.getElementById('contact').value,
+                phone: document.getElementById('phoneInput').value || null,
+                message: document.getElementById('message').value
+            };
+
+            // Send form data as JSON
+            fetch('/.netlify/functions/form-submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('Form submitted successfully!');
+                console.log('Success:', data);
+            })
+            .catch(error => {
+                alert('Error submitting form.');
+                console.error('Error:', error);
+            });
         });
     </script>
 </body>

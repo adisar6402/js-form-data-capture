@@ -23,20 +23,40 @@ const formSubmitHandler = async (event) => {
     if (event.httpMethod === "POST") {
       console.log("POST request received.");
 
-      // Parse request body
-      const { name, email, contact, phone, message } = JSON.parse(event.body);
+      // Log the raw event body
+      console.log("Raw event body:", event.body);
 
-      // Validate required fields
+      // Attempt to parse the body as JSON
+      let requestBody;
+      try {
+        requestBody = JSON.parse(event.body);
+      } catch (parseError) {
+        console.error("Failed to parse JSON:", parseError.message);
+        return {
+          statusCode: 400,
+          headers: corsHeaders,
+          body: JSON.stringify({
+            message: "Invalid JSON format",
+            details: parseError.message, // Include details about the error
+          }),
+        };
+      }
+
+      // Extract and validate fields
+      const { name, email, contact, phone, message } = requestBody;
       if (!name || !email || !contact || !message) {
         console.error("Missing required fields.");
         return {
           statusCode: 400,
           headers: corsHeaders,
-          body: JSON.stringify({ error: "Required fields are missing" }),
+          body: JSON.stringify({
+            message: "Required fields are missing",
+            details: "One or more required fields are missing in the request.",
+          }),
         };
       }
 
-      // Test email configuration
+      // Set up Nodemailer
       console.log("Setting up Nodemailer...");
       const transporter = nodemailer.createTransport({
         service: "gmail",
@@ -58,7 +78,7 @@ const formSubmitHandler = async (event) => {
       await transporter.sendMail(mailOptions);
       console.log("Email sent successfully.");
 
-      // Test MongoDB configuration
+      // Connect to MongoDB
       console.log("Connecting to MongoDB...");
       const uri = process.env.MONGODB_URI;
       const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -92,7 +112,7 @@ const formSubmitHandler = async (event) => {
     return {
       statusCode: 405,
       headers: corsHeaders,
-      body: JSON.stringify({ error: "Method not allowed" }),
+      body: JSON.stringify({ message: "Method not allowed" }),
     };
   } catch (error) {
     console.error("Form submission failed:", error.message, error.stack);
@@ -100,7 +120,7 @@ const formSubmitHandler = async (event) => {
       statusCode: 500,
       headers: corsHeaders,
       body: JSON.stringify({
-        error: "Internal server error",
+        message: "Internal server error",
         details: error.message, // Include detailed error message
       }),
     };
