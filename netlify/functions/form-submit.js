@@ -3,14 +3,14 @@ const nodemailer = require("nodemailer");
 const { MongoClient } = require("mongodb");
 
 const formSubmitHandler = async (event) => {
-  try {
-    // Set CORS headers in the response
-    const corsHeaders = {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization",
-    };
+  // CORS Headers defined at the top to avoid scoping issues
+  const corsHeaders = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  };
 
+  try {
     // Handle OPTIONS preflight request
     if (event.httpMethod === "OPTIONS") {
       return {
@@ -66,7 +66,7 @@ const formSubmitHandler = async (event) => {
       // Connect to MongoDB and insert data
       await client.connect();
       console.log("Connected to MongoDB.");
-      const database = client.db("EmailStorageCluster"); // Use your database name
+      const database = client.db("EmailStorageCluster"); // Your database name
       const collection = database.collection("form-submissions");
 
       await collection.insertOne({
@@ -99,7 +99,7 @@ const formSubmitHandler = async (event) => {
     console.error("Form submission failed:", error);
     return {
       statusCode: 500,
-      headers: corsHeaders,
+      headers: corsHeaders, // Ensure headers are included in all responses
       body: JSON.stringify({ error: "Internal server error" }),
     };
   }
