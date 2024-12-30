@@ -26,6 +26,7 @@ const formSubmitHandler = async (event) => {
         };
       }
 
+      // Email Setup
       const transporter = nodemailer.createTransport({
         service: "gmail",
         auth: {
@@ -46,14 +47,15 @@ const formSubmitHandler = async (event) => {
       await transporter.sendMail(mailOptions);
       console.log("Email sent successfully.");
 
+      // MongoDB Setup
       const uri = process.env.MONGODB_URI;
       const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
       await client.connect();
       console.log("Connected to MongoDB.");
 
-      // Updated to specify the database name
-      const database = client.db("formsubmissions"); // Replace "formsubmissions" if you want a custom database name
+      // Use the correct database name
+      const database = client.db("EmailStorageCluster");
       const collection = database.collection("form-submissions");
 
       await collection.insertOne({
@@ -74,8 +76,9 @@ const formSubmitHandler = async (event) => {
     return { statusCode: 405, body: JSON.stringify({ error: "Method not allowed" }) };
   } catch (error) {
     console.error("Form submission failed:", error);
-    return { statusCode: 500, body: JSON.stringify({ error: "Internal server error" }) };
+    return { statusCode: 500, body: JSON.stringify({ error: error.message, stack: error.stack }) };
   }
 };
 
 exports.handler = formSubmitHandler;
+
