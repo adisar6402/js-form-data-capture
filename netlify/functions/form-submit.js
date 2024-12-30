@@ -52,7 +52,8 @@ const formSubmitHandler = async (event) => {
       await client.connect();
       console.log("Connected to MongoDB.");
 
-      const database = client.db();
+      // Updated to specify the database name
+      const database = client.db("formsubmissions"); // Replace "formsubmissions" if you want a custom database name
       const collection = database.collection("form-submissions");
 
       await collection.insertOne({
