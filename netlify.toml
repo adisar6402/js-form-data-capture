@@ -1,9 +1,9 @@
 [build]
-  publish = "public"  # The directory to publish
-  functions = "functions"  # Directory where the functions are defined
+  publish = "public" # The directory to publish
+  functions = "netlify/functions" # Directory where the functions are located
 
 [[redirects]]
-  from = "/.netlify/functions/*"
+  from = "/api/*" # Adjusting for friendly route paths
   to = "/.netlify/functions/:splat"
   status = 200
 

@@ -1,104 +1,79 @@
-
 const mongoose = require("mongoose");
 const nodemailer = require("nodemailer");
 const { MongoClient } = require("mongodb");
 
 const formSubmitHandler = async (event) => {
   try {
-    // Handle CORS
     event.setHeaders({
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
     });
 
-    // Preflight request
     if (event.httpMethod === "OPTIONS") {
       return { statusCode: 200, body: "" };
     }
 
     if (event.httpMethod === "POST") {
-      const { name, email, contact, phone, message } = JSON.parse(event.body);
+      console.log("POST request received.");
 
+      const { name, email, contact, phone, message } = JSON.parse(event.body);
       if (!name || !email || !contact || !message) {
+        console.error("Missing required fields.");
         return {
           statusCode: 400,
           body: JSON.stringify({ error: "Required fields are missing" }),
         };
       }
 
-      // Create email transporter
       const transporter = nodemailer.createTransport({
         service: "gmail",
         auth: {
-          user: process.env.GMAIL_USER,  // Gmail email
-          pass: process.env.GMAIL_APP_PASSWORD, // Gmail app password
+          user: process.env.GMAIL_USER,
+          pass: process.env.GMAIL_APP_PASSWORD,
         },
       });
 
-      // Email content
       const mailOptions = {
         from: process.env.GMAIL_USER,
-        to: process.env.GMAIL_USER, // Send email to self for notification
+        to: process.env.GMAIL_USER,
         subject: "New Form Submission",
-        text: `
-          Name: ${name}\n
-          Email: ${email}\n
-          Preferred Contact: ${contact}\n
-          Phone: ${phone || "N/A"}\n
-          Message: ${message}
-        `,
+        text: `Name: ${name}\nEmail: ${email}\nContact: ${contact}\nPhone: ${
+          phone || "N/A"
+        }\nMessage: ${message}`,
       };
 
-      // Send email
       await transporter.sendMail(mailOptions);
+      console.log("Email sent successfully.");
 
-      // MongoDB connection
       const uri = process.env.MONGODB_URI;
+      const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
-      const client = new MongoClient(uri, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      });
-
-      // Connect to MongoDB
       await client.connect();
+      console.log("Connected to MongoDB.");
 
-      // Insert form data into MongoDB collection
       const database = client.db();
       const collection = database.collection("form-submissions");
 
-      const submission = {
+      await collection.insertOne({
         name,
         email,
         contact,
         phone: phone || "N/A",
         message,
         submittedAt: new Date(),
-      };
+      });
 
-      await collection.insertOne(submission);
-
-      // Close database connection
       await client.close();
+      console.log("Form data stored successfully.");
 
-      return {
-        statusCode: 200,
-        body: JSON.stringify({ message: "Form submitted successfully!" }),
-      };
+      return { statusCode: 200, body: JSON.stringify({ message: "Form submitted successfully!" }) };
     }
 
-    return {
-      statusCode: 405, // Method Not Allowed
-      body: JSON.stringify({ error: "Method not allowed" }),
-    };
+    return { statusCode: 405, body: JSON.stringify({ error: "Method not allowed" }) };
   } catch (error) {
     console.error("Form submission failed:", error);
-
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: "Internal server error" }),
-    };
+    return { statusCode: 500, body: JSON.stringify({ error: "Internal server error" }) };
   }
 };
 

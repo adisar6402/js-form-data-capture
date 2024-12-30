@@ -17,7 +17,7 @@
             margin: 0;
             background: url('images/form-background.jpg') no-repeat center center fixed;
             background-size: cover;
-            color: #333;
+            color: #333; 
         }
 
         header,
@@ -147,7 +147,7 @@
         <section id="form-section" class="form-section">
             <h2>Contact Information</h2>
             <p>Please fill out the form below to get in touch. Your information will be processed securely, and we'll get back to you shortly.</p>
-            <form id="userForm" method="POST" action="/.netlify/functions/form-submit" enctype="application/x-www-form-urlencoded" novalidate>
+            <form id="userForm" method="POST" action="/api/form-submit" enctype="application/x-www-form-urlencoded" novalidate>
                 <label for="name">Name:</label>
                 <input type="text" id="name" name="name" placeholder="Enter your name" required autocomplete="name">
 
@@ -195,4 +195,5 @@
         });
     </script>
 </body>
+
 </html>
