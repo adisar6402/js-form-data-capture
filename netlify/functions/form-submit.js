@@ -3,7 +3,6 @@ const nodemailer = require("nodemailer");
 const { MongoClient } = require("mongodb");
 
 const formSubmitHandler = async (event) => {
-  // CORS Headers defined at the top to avoid scoping issues
   const corsHeaders = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
@@ -37,7 +36,8 @@ const formSubmitHandler = async (event) => {
         };
       }
 
-      // Configure Nodemailer
+      // Test email configuration
+      console.log("Setting up Nodemailer...");
       const transporter = nodemailer.createTransport({
         service: "gmail",
         auth: {
@@ -55,18 +55,18 @@ const formSubmitHandler = async (event) => {
         }\nMessage: ${message}`,
       };
 
-      // Send email
       await transporter.sendMail(mailOptions);
       console.log("Email sent successfully.");
 
-      // Configure MongoDB
+      // Test MongoDB configuration
+      console.log("Connecting to MongoDB...");
       const uri = process.env.MONGODB_URI;
       const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
-      // Connect to MongoDB and insert data
       await client.connect();
       console.log("Connected to MongoDB.");
-      const database = client.db("EmailStorageCluster"); // Your database name
+
+      const database = client.db("EmailStorageCluster"); // Replace with your database name
       const collection = database.collection("form-submissions");
 
       await collection.insertOne({
@@ -81,7 +81,6 @@ const formSubmitHandler = async (event) => {
       await client.close();
       console.log("Form data stored successfully.");
 
-      // Return success response
       return {
         statusCode: 200,
         headers: corsHeaders,
@@ -96,11 +95,14 @@ const formSubmitHandler = async (event) => {
       body: JSON.stringify({ error: "Method not allowed" }),
     };
   } catch (error) {
-    console.error("Form submission failed:", error);
+    console.error("Form submission failed:", error.message, error.stack);
     return {
       statusCode: 500,
-      headers: corsHeaders, // Ensure headers are included in all responses
-      body: JSON.stringify({ error: "Internal server error" }),
+      headers: corsHeaders,
+      body: JSON.stringify({
+        error: "Internal server error",
+        details: error.message, // Include detailed error message
+      }),
     };
   }
 };
